@@ -8,7 +8,7 @@ A custom-built physics and rendering engine developed in C++ using DirectX 11. I
 
 ## ✨ Features
 
-### ⚙️ Physics Engine
+### ⚙️ Physics Features
 - **Rigidbody system**
 - **Velocity, acceleration, and gravity**
 - **Drag, thurst and friction**
@@ -16,7 +16,7 @@ A custom-built physics and rendering engine developed in C++ using DirectX 11. I
 - **Custom update loop and physics integration**
 - **Buoyancy**
 
-### 🖼 Rendering Engine
+### 🖼 Rendering Features
 - **2D and 3D shape rendering**
 - **Simple camera system**
 - **DirectX 11 powered rendering pipeline**
