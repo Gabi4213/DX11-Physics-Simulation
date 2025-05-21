@@ -1,0 +1,11 @@
+﻿  Application.cpp
+C:\Users\offic\Downloads\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main (1)\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main\FrameworkDX11\Application.cpp(161,11): warning C4458: declaration of 'objMeshData' hides class member
+      C:\Users\offic\Downloads\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main (1)\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main\FrameworkDX11\Application.h(105,11):
+      see declaration of 'Application::objMeshData'
+  
+C:\Users\offic\Downloads\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main (1)\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main\FrameworkDX11\Application.cpp(230,18): warning C4456: declaration of 'particleModel' hides previous local declaration
+      C:\Users\offic\Downloads\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main (1)\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main\FrameworkDX11\Application.cpp(198,17):
+      see declaration of 'particleModel'
+  
+C:\Users\offic\Downloads\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main (1)\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main\FrameworkDX11\Application.cpp(858,21): warning C4244: 'initializing': conversion from 'ULONGLONG' to 'DWORD', possible loss of data
+  FrameworkDX11.vcxproj -> C:\Users\offic\Downloads\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main (1)\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main\x64\Debug\FrameworkDX11.exe
