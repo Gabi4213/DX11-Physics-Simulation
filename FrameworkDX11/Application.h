@@ -91,7 +91,8 @@ private:
 	ID3D11ShaderResourceView* _pTextureRV = nullptr;
 	ID3D11ShaderResourceView* _pTextureRV2 = nullptr;
 	ID3D11ShaderResourceView* _pTextureRV3 = nullptr;
-	ID3D11ShaderResourceView * _pTextureRV4 = nullptr;
+	ID3D11ShaderResourceView* _pTextureRV4 = nullptr;
+	ID3D11ShaderResourceView * _pTextureRV5 = nullptr;
 	ID3D11ShaderResourceView* _waterTexture = nullptr;
 
 
@@ -111,6 +112,10 @@ private:
 	GameObject* floatingObject;
 	GameObject* waterObject;
 
+
+
+	GameObject* currentObjectIndicator;
+	int currentObjectIndex;
 
 	GameObject* floorGameObject;
 

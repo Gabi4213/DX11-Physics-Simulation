@@ -127,8 +127,7 @@ void CollisionHandler::CollisionResponseInterPenetration(float time, GameObject*
 	// apply separation
 	obj1->GetTransform()->SetPosition(Vector3D(obj1->GetTransform()->GetPosition().x + -bodyMovement[0].x - 0.2f, obj1->GetTransform()->GetPosition().y, obj1->GetTransform()->GetPosition().z));
 	obj2->GetTransform()->SetPosition(Vector3D(obj2->GetTransform()->GetPosition().x + bodyMovement[1].x + 0.2f, obj2->GetTransform()->GetPosition().y, obj2->GetTransform()->GetPosition().z));
-
-} //inter penetration separation
+}
 
 void CollisionHandler::UpdateCollisionBoundries(GameObject* obj1, GameObject* obj2)
 {

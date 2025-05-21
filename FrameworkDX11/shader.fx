@@ -87,7 +87,10 @@ float4 PS(VS_OUTPUT input) : SV_Target
     float3 toEye = normalize(EyePosW - input.PosW);
 
 	// Get texture data from file
-    float4 textureColour = txDiffuse.Sample(samLinear, input.Tex);
+    float2 tiledUV = input.Tex * float2(10.0f, 10.0f);
+    float4 textureColour = txDiffuse.Sample(samLinear, tiledUV);
+    
+   
 
     float3 ambient = float3(0.0f, 0.0f, 0.0f);
     float3 diffuse = float3(0.0f, 0.0f, 0.0f);

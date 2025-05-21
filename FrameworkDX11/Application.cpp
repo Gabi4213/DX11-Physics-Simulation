@@ -27,29 +27,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 bool Application::HandleKeyboard(MSG msg)
 {
-	XMFLOAT3 cameraPosition = _camera->GetPosition();
-
 	switch (msg.wParam)
 	{
-	case VK_UP:
-		_cameraOrbitRadius = max(_cameraOrbitRadiusMin, _cameraOrbitRadius - (_cameraSpeed * 0.2f));
-		return true;
-		break;
-
-	case VK_DOWN:
-		_cameraOrbitRadius = min(_cameraOrbitRadiusMax, _cameraOrbitRadius + (_cameraSpeed * 0.2f));
-		return true;
-		break;
-
-	case VK_RIGHT:
-		_cameraOrbitAngleXZ -= _cameraSpeed;
-		return true;
-		break;
-
-	case VK_LEFT:
-		_cameraOrbitAngleXZ += _cameraSpeed;
-		return true;
-		break;
 
 	case WM_SETFOCUS: // Called on window focus
 	{
@@ -118,15 +97,16 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
     }
 
 	//Get textures
-	CreateDDSTextureFromFile(_pd3dDevice, L"Resources\\stone.dds", nullptr, &_pTextureRV);
-	CreateDDSTextureFromFile(_pd3dDevice, L"Resources\\stone2.dds", nullptr, &_pTextureRV2);
-	CreateDDSTextureFromFile(_pd3dDevice, L"Resources\\stone3.dds", nullptr, &_pTextureRV3);
+	CreateDDSTextureFromFile(_pd3dDevice, L"Resources\\color_1.dds", nullptr, &_pTextureRV);
+	CreateDDSTextureFromFile(_pd3dDevice, L"Resources\\color_2.dds", nullptr, &_pTextureRV2);
+	CreateDDSTextureFromFile(_pd3dDevice, L"Resources\\color_3.dds", nullptr, &_pTextureRV3);
+	CreateDDSTextureFromFile(_pd3dDevice, L"Resources\\color_4.dds", nullptr, &_pTextureRV4);
 	CreateDDSTextureFromFile(_pd3dDevice, L"Resources\\floor.dds", nullptr, &_pGroundTextureRV);
-	CreateDDSTextureFromFile(_pd3dDevice, L"Resources\\smoke.dds", nullptr, &_pTextureRV4);
+	CreateDDSTextureFromFile(_pd3dDevice, L"Resources\\smoke.dds", nullptr, &_pTextureRV5);
 	CreateDDSTextureFromFile(_pd3dDevice, L"Resources\\water.dds", nullptr, &_waterTexture);
 
     // Setup Camera
-	XMFLOAT3 eye = XMFLOAT3(0.0f, 2.0f, -1.0f);
+	XMFLOAT3 eye = XMFLOAT3(0.0f, 2.0f, 10.0f);
 	XMFLOAT3 at = XMFLOAT3(0.0f, 2.0f, 0.0f);
 	XMFLOAT3 up = XMFLOAT3(0.0f, 1.0f, 0.0f);
 
@@ -165,6 +145,15 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 	sphereGeometry.vertexBufferOffset = objMeshData.VBOffset;
 	sphereGeometry.vertexBufferStride = objMeshData.VBStride;
 
+
+	Geometry indicatorGeometry;
+	MeshData indicatorMeshData = OBJLoader::Load((char*)"arrow.obj", _pd3dDevice);
+	indicatorGeometry.indexBuffer = indicatorMeshData.IndexBuffer;
+	indicatorGeometry.numberOfIndices = indicatorMeshData.IndexCount;
+	indicatorGeometry.vertexBuffer = indicatorMeshData.VertexBuffer;
+	indicatorGeometry.vertexBufferOffset = indicatorMeshData.VBOffset;
+	indicatorGeometry.vertexBufferStride = indicatorMeshData.VBStride;
+
 	Geometry planeGeometry;
 	planeGeometry.indexBuffer = _pPlaneIndexBuffer;
 	planeGeometry.vertexBuffer = _pPlaneVertexBuffer;
@@ -190,7 +179,7 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 
 	Transform* floorTransform = new Transform();
 	floorTransform->SetPosition(0.0f, -0.3f, 10.0f);
-	floorTransform->SetScale(15.0f, 15.0f, 15.0f);
+	floorTransform->SetScale(30.0f, 30.0f, 30.0f);
 	floorTransform->SetRotation(Vector3D(XMConvertToRadians(90.0f), 0.0f,0.0f));
 
 
@@ -204,6 +193,23 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 
 
 	_gameObjects.push_back(floorGameObject);
+
+
+//-----------------------------------------------------Object Indicator--------------------------------------------------
+	Appearance* indicatorApperance = new Appearance(indicatorGeometry, noSpecMaterial);
+	indicatorApperance->SetTextureRV(_pTextureRV4);
+
+	Transform* indicatorTransform = new Transform();
+	indicatorTransform->SetPosition(0.0f, 0.0f, 0.0f);
+	indicatorTransform->SetScale(0.5f, 0.5f, 0.5f);
+	indicatorTransform->SetRotation(Vector3D(0.0f, 0.0f, 0.0f));
+
+	ParticleModel* indicatorParticleModel = new ParticleModel(indicatorTransform, true, Vector3D(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 2.5f);
+
+	currentObjectIndicator = new GameObject("indicator", indicatorApperance, indicatorTransform, indicatorParticleModel);
+
+	Vector3D indicatorVelocity = Vector3D(0.0f, 0.0f, 0.0f);
+	currentObjectIndicator->GetParticleModel()->SetVelocity(indicatorVelocity);
 	
 //----------------------------------------------------CUBES---------------------------------------------------
 
@@ -335,6 +341,8 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 	_gameObjects[9]->SetActive(false);
 	_gameObjects[8]->SetActive(false);
 
+
+	currentObjectIndex = 0;
 
 	return S_OK;
 }
@@ -874,7 +882,7 @@ void Application::Update()
 	cameraPos.z = z;
 
 	_camera->SetPosition(cameraPos);
-	_camera->Update();
+	_camera->Update(deltaTime);
 
 	if (_ButtonPressed)
 	{
@@ -887,146 +895,92 @@ void Application::Update()
 		_gameObjects[i]->Update(deltaTime);	
 	}
 
+	if (currentObjectIndex >= 0 && currentObjectIndex < _gameObjects.size() -1)
+	{
+		GameObject* selectedObject = _gameObjects[currentObjectIndex];
+
+		Vector3D selectedPosition = selectedObject->GetTransform()->GetPosition();
+
+		Vector3D indicatorPosition = Vector3D(selectedPosition.x, selectedPosition.y + 1.0f, selectedPosition.z);
+		currentObjectIndicator->GetTransform()->SetPosition(indicatorPosition);
+	}
+
+	currentObjectIndicator->Update(deltaTime);
+
 	_ps->Update(deltaTime);
 	_ps2->Update(deltaTime);
 
-//-----------------------------------------------------------------------Sphere Cube collisions------------------------------------------------
-	ParticleModel* particleModel = _gameObjects[1]->GetParticleModel();
-	
-	if (particleModel)
+
+	//-----------------------------------------------------------------------General Collision Checks------------------------------------------------
+	for (int i = 0; i < _gameObjects.size(); i++)
 	{
+		for (int j = i + 1; j < _gameObjects.size(); j++)  // Only check pairs once (avoid redundant checks)
+		{
+			ParticleModel* particleModel1 = _gameObjects[i]->GetParticleModel();
+			ParticleModel* particleModel2 = _gameObjects[j]->GetParticleModel();
 
-			BoundingSphere sphere1 = _gameObjects[1]->GetParticleModel()->GetSphere();
-			BoundingSphere sphere2 = _gameObjects[2]->GetParticleModel()->GetSphere();
-
-			BoundingBox box1 = _gameObjects[1]->GetParticleModel()->GetBox();
-			BoundingBox box2 = _gameObjects[2]->GetParticleModel()->GetBox();
-
-			if (_collisionHandler->CheckCollision(sphere1, box2))
+			if (particleModel1 && particleModel2)
 			{
-				particleModel->SetCollidingBool(true);
-				Vector3D vel = _gameObjects[1]->GetParticleModel()->GetVelocity();
-				//_collisionHandler->CollisionResponseSphereCube(_gameObjects[1]->GetParticleModel()->GetVelocity(), _gameObjects[1], _gameObjects[2], deltaTime);
-				//_collisionHandler->CollisionResponseInterPenetration(deltaTime, _gameObjects[1], _gameObjects[2]);
+				// Get bounding volumes for the objects
+				BoundingSphere sphere1 = particleModel1->GetSphere();
+				BoundingSphere sphere2 = particleModel2->GetSphere();
+
+				BoundingBox box1 = particleModel1->GetBox();
+				BoundingBox box2 = particleModel2->GetBox();
+
+				// Check collisions between spheres
+				if (_collisionHandler->CheckCollision(sphere1, sphere2))
+				{
+					particleModel1->SetCollidingBool(true);
+					particleModel2->SetCollidingBool(true);
+					// Handle collision response, if necessary
+					_collisionHandler->CollisionResponseInterPenetration(deltaTime, _gameObjects[i], _gameObjects[j]);
+				}
+				// Check collisions between bounding boxes
+				else if (_collisionHandler->CheckCollision(box1, box2))
+				{
+					particleModel1->SetCollidingBool(true);
+					particleModel2->SetCollidingBool(true);
+					// Handle collision response, if necessary
+					_collisionHandler->CollisionResponseInterPenetration(deltaTime, _gameObjects[i], _gameObjects[j]);
+				}
+				else
+				{
+					particleModel1->SetCollidingBool(false);
+					particleModel2->SetCollidingBool(false);
+				}
 			}
-			else
-			{
-				particleModel->SetCollidingBool(false);
-			}
-
-	}
-
-//-----------------------------------------------------------------------sphere sphere collisions------------------------------------------------
-	ParticleModel* sphereParticleModel = _gameObjects[3]->GetParticleModel();
-
-	if (sphereParticleModel)
-	{
-
-		BoundingSphere sphere1 = _gameObjects[3]->GetParticleModel()->GetSphere();
-		BoundingSphere sphere2 = _gameObjects[4]->GetParticleModel()->GetSphere();
-
-		if (_collisionHandler->CheckCollision(sphere1, sphere2))
-		{
-			sphereParticleModel->SetCollidingBool(true);
-			Vector3D vel = _gameObjects[3]->GetParticleModel()->GetVelocity();
-			//_collisionHandler->CollisionResponseMoveVel(_gameObjects[3]->GetParticleModel()->GetVelocity(), _gameObjects[3], _gameObjects[4], deltaTime);		
-			_collisionHandler->CollisionResponseInterPenetration(deltaTime, _gameObjects[3], _gameObjects[4]);
 		}
-		else
-		{
-			sphereParticleModel->SetCollidingBool(false);
-		}
-
-	}
-
-//-----------------------------------------------------------------------Cube Cube collisions------------------------------------------------
-	ParticleModel* cubeSphereParticleModel = _gameObjects[5]->GetParticleModel();
-
-	if (cubeSphereParticleModel)
-	{
-
-		BoundingBox box1 = _gameObjects[5]->GetParticleModel()->GetBox();
-		BoundingBox box2 = _gameObjects[6]->GetParticleModel()->GetBox();
-
-
-		if (_collisionHandler->CheckCollision(box1, box2))
-		{
-			cubeSphereParticleModel->SetCollidingBool(true);
-			Vector3D vel = _gameObjects[5]->GetParticleModel()->GetVelocity();
-			_collisionHandler->CollisionResponseMoveVel(_gameObjects[CurrentSelectedObject]->GetParticleModel()->GetVelocity(), _gameObjects[CurrentSelectedObject], _gameObjects[SecondaryObject], deltaTime);
-		}
-		else
-		{
-			cubeSphereParticleModel->SetCollidingBool(false);
-		}
-
-
 	}
 }
 
 void Application::Keyboard(float deltaTime)
 {
-	// Move gameobject
-	if (GetAsyncKeyState('2') < 0)
+	if (GetAsyncKeyState('A') < 0)
 	{
-		MoveSphere(deltaTime);
-	}
-	if (GetAsyncKeyState('1') < 0)
-	{
-		moveBackward(1, deltaTime);
+		moveBackward(currentObjectIndex, deltaTime);
 	}
 
-	if (GetAsyncKeyState('4') < 0)
+	if (GetAsyncKeyState('D') < 0)
 	{
-		moveForward(3, deltaTime);
-	}
-	if (GetAsyncKeyState('3') < 0)
-	{
-		moveBackward(3, deltaTime);
-	}
-
-	if (GetAsyncKeyState('6') < 0)
-	{
-		moveForward(5, deltaTime);
-		CurrentSelectedObject = 5;
-		SecondaryObject = 6;
-	}
-	if (GetAsyncKeyState('5') < 0)
-	{
-		moveBackward(5, deltaTime);
-		CurrentSelectedObject = 5;
-		SecondaryObject = 6;
-	}
-
-	if (GetAsyncKeyState('7') < 0)
-	{
-		moveBackward(6, deltaTime);
-		CurrentSelectedObject = 6;
-		SecondaryObject = 5;
-	}
-
-	if (GetAsyncKeyState('8') < 0)
-	{
-		moveForward(6, deltaTime);
-		CurrentSelectedObject = 6;
-		SecondaryObject = 5;
+		moveForward(currentObjectIndex, deltaTime);
 	}
 
 	//thrust
-	if (GetAsyncKeyState(VK_SPACE) < 0)
+	if (GetAsyncKeyState(VK_RETURN) < 0)
 	{
-		if (_gameObjects[3]->GetParticleModel()->GetGrav())
+		if (_gameObjects[currentObjectIndex]->GetParticleModel()->GetGrav())
 		{
-			_gameObjects[3]->GetParticleModel()->SetThrust(0.0f, _gameObjects[3]->GetParticleModel()->GetThrust().y + 0.00010f, 0.0f);
+			_gameObjects[currentObjectIndex]->GetParticleModel()->SetThrust(0.0f, _gameObjects[currentObjectIndex]->GetParticleModel()->GetThrust().y + 0.00010f, 0.0f);
 		}
 		else 
 		{
-			_gameObjects[3]->GetParticleModel()->SetThrust(0.0f, _gameObjects[3]->GetParticleModel()->GetThrust().y + 0.000001f, 0.0f);
+			_gameObjects[currentObjectIndex]->GetParticleModel()->SetThrust(0.0f, _gameObjects[currentObjectIndex]->GetParticleModel()->GetThrust().y + 0.000001f, 0.0f);
 		}
 	}
 
 	//rotations
-	if (GetAsyncKeyState('W') < 0)
+	/*if (GetAsyncKeyState('W') < 0)
 	{
 		_gameObjects[2]->GetRigidBody()->AddRotationForce(Vector3D(0, 0.0005f, 0),Vector3D(0,0,0), deltaTime);
 	}
@@ -1043,7 +997,7 @@ void Application::Keyboard(float deltaTime)
 	if (GetAsyncKeyState('D') < 0)
 	{
 		_gameObjects[2]->GetRigidBody()->AddRotationForce(Vector3D(0.0005f, 0, 0), Vector3D(0, 0, 0), deltaTime);
-	}
+	}*/
 
 	//enable and disable particles
 	if (GetAsyncKeyState('Z') < 0)
@@ -1089,6 +1043,37 @@ void Application::Keyboard(float deltaTime)
 	{
 		_gameObjects[3]->GetParticleModel()->SetGrav(false);
 	}
+
+	//increase/decrease current selected index
+	static bool oKeyPressed = false;
+	static bool pKeyPressed = false;
+
+	if (GetAsyncKeyState('O') < 0)
+	{
+		if (!oKeyPressed && currentObjectIndex > 0)
+		{
+			currentObjectIndex--;
+			oKeyPressed = true; 
+		}
+	}
+	else
+	{
+		oKeyPressed = false; 
+	}
+
+	if (GetAsyncKeyState('P') < 0)
+	{
+		if (!pKeyPressed && currentObjectIndex < _gameObjects.size() - 1)
+		{
+			currentObjectIndex++;
+			pKeyPressed = true;
+		}
+	}
+	else
+	{
+		pKeyPressed = false;
+	}
+
 }
 
 void Application::Draw()
@@ -1097,7 +1082,7 @@ void Application::Draw()
 	// Clear buffers
 	//
 
-	float ClearColor[4] = { 0.5f, 0.5f, 0.5f, 1.0f }; // red,green,blue,alpha
+	float ClearColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f }; // red,green,blue,alpha
 	_pImmediateContext->ClearRenderTargetView(_pRenderTargetView, ClearColor);
 	_pImmediateContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
@@ -1186,6 +1171,8 @@ void Application::Draw()
 		particles->Draw(_pImmediateContext);
 	}
 
+	ConstantBufferFunc(currentObjectIndicator, cb);
+	currentObjectIndicator->Draw(_pImmediateContext);
 
     //
     // Present our back buffer to our front buffer

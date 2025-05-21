@@ -1,11 +1,15 @@
 ﻿  Application.cpp
-C:\Users\offic\Downloads\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main (1)\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main\FrameworkDX11\Application.cpp(161,11): warning C4458: declaration of 'objMeshData' hides class member
-      C:\Users\offic\Downloads\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main (1)\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main\FrameworkDX11\Application.h(105,11):
+G:\Unity\UnityProjects\Git\DX11-Physics-Simulation\FrameworkDX11\Application.cpp(114,86): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+G:\Unity\UnityProjects\Git\DX11-Physics-Simulation\FrameworkDX11\Application.cpp(114,79): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+G:\Unity\UnityProjects\Git\DX11-Physics-Simulation\FrameworkDX11\Application.cpp(114,64): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+G:\Unity\UnityProjects\Git\DX11-Physics-Simulation\FrameworkDX11\Application.cpp(114,43): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+G:\Unity\UnityProjects\Git\DX11-Physics-Simulation\FrameworkDX11\Application.cpp(141,11): warning C4458: declaration of 'objMeshData' hides class member
+      G:\Unity\UnityProjects\Git\DX11-Physics-Simulation\FrameworkDX11\Application.h(106,11):
       see declaration of 'Application::objMeshData'
   
-C:\Users\offic\Downloads\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main (1)\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main\FrameworkDX11\Application.cpp(230,18): warning C4456: declaration of 'particleModel' hides previous local declaration
-      C:\Users\offic\Downloads\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main (1)\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main\FrameworkDX11\Application.cpp(198,17):
+G:\Unity\UnityProjects\Git\DX11-Physics-Simulation\FrameworkDX11\Application.cpp(236,18): warning C4456: declaration of 'particleModel' hides previous local declaration
+      G:\Unity\UnityProjects\Git\DX11-Physics-Simulation\FrameworkDX11\Application.cpp(187,17):
       see declaration of 'particleModel'
   
-C:\Users\offic\Downloads\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main (1)\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main\FrameworkDX11\Application.cpp(858,21): warning C4244: 'initializing': conversion from 'ULONGLONG' to 'DWORD', possible loss of data
-  FrameworkDX11.vcxproj -> C:\Users\offic\Downloads\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main (1)\advanced-real-time-graphics-directx-11-2024-25-Gabi4213-main\x64\Debug\FrameworkDX11.exe
+G:\Unity\UnityProjects\Git\DX11-Physics-Simulation\FrameworkDX11\Application.cpp(866,21): warning C4244: 'initializing': conversion from 'ULONGLONG' to 'DWORD', possible loss of data
+  FrameworkDX11.vcxproj -> G:\Unity\UnityProjects\Git\DX11-Physics-Simulation\x64\Debug\FrameworkDX11.exe
