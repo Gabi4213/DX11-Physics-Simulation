@@ -21,6 +21,7 @@ A custom-built physics and rendering engine developed in C++ using DirectX 11. I
 - **Simple camera system**
 - **DirectX 11 powered rendering pipeline**
 - **Real-time visual feedback**
+- **Ambient, Diffuse and Specular Lighting**
 
 ## 🛠 Technologies Used
 - **Language: C++**
